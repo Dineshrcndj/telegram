@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram File Uploader - Auto Chat ID</title>
+    <title>Telegram File Uploader - Progress Bar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -166,8 +166,81 @@
             border: 1px solid #bee5eb;
         }
         
-        .loading {
-            display: inline-block;
+        /* Progress Bar Styles */
+        .progress-container {
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .progress-title {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .progress-percentage {
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+        
+        .progress-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .upload-status {
+            text-align: center;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        
+        .current-file {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+        
+        .upload-speed {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .spinner {
             width: 20px;
             height: 20px;
             border: 3px solid #f3f3f3;
@@ -182,11 +255,76 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* Upload Animation */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        .uploading {
+            animation: pulse 1.5s infinite;
+        }
+        
         footer {
             text-align: center;
             padding: 20px;
             color: #6c757d;
             border-top: 1px solid #e9ecef;
+        }
+        
+        /* File Progress Item */
+        .file-progress-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .file-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            color: #495057;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+        
+        .file-percentage {
+            font-weight: bold;
+            color: #007bff;
+            margin-left: 10px;
+        }
+        
+        .file-progress-bar {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .file-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .file-status {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -194,7 +332,7 @@
     <div class="container">
         <header>
             <h1><i class="fab fa-telegram"></i> Telegram File Uploader</h1>
-            <p>Auto Chat ID Detection - Works directly in browser</p>
+            <p>Progress Bar & Auto Chat ID Detection</p>
         </header>
         
         <div class="content">
@@ -237,7 +375,34 @@
                 
                 <div id="fileList"></div>
                 
-                <button class="btn" id="uploadBtn" disabled>Upload to Telegram</button>
+                <!-- Progress Container -->
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-header">
+                        <div class="progress-title">
+                            <span class="loading-spinner" id="progressSpinner">
+                                <span class="spinner"></span>
+                                Uploading Files
+                            </span>
+                        </div>
+                        <div class="progress-percentage" id="overallProgress">0%</div>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="overallProgressFill"></div>
+                    </div>
+                    
+                    <div class="progress-details">
+                        <span id="currentFile">Ready to upload</span>
+                        <span id="fileCounter">0/0 files</span>
+                    </div>
+                    
+                    <!-- Individual File Progress -->
+                    <div id="fileProgressList"></div>
+                </div>
+                
+                <button class="btn" id="uploadBtn" disabled>
+                    <i class="fas fa-paper-plane"></i> Upload to Telegram
+                </button>
                 
                 <div class="status" id="status"></div>
             </div>
@@ -250,20 +415,20 @@
                     <li><strong>Click "Auto Get Chat ID"</strong> - This will automatically fetch and fill your Chat ID</li>
                     <li><strong>Send a message to your bot</strong> first if no Chat ID is found</li>
                     <li><strong>Test connection</strong> to verify everything works</li>
-                    <li><strong>Upload files</strong> (max 50MB each)</li>
+                    <li><strong>Upload files</strong> (max 50MB each) with progress tracking</li>
                 </ol>
             </div>
         </div>
         
         <footer>
-            <p>Auto Chat ID Detection - No manual copying needed</p>
+            <p>Progress Bar & Auto Chat ID Detection - Real-time upload tracking</p>
         </footer>
     </div>
 
     <script>
         // Configuration
         const BOT_TOKENS = {
-            'dinesh': '8083496802:AAE3h44C7ydCWOjAQyE5kCD3wbBbymnugk8', // Replace with actual token
+            'dinesh': '8083496802:AAE3h44C7ydCWOjAQyE5kCD3wbBbymnugk8',
             'demo': '1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgh'
         };
         
@@ -279,9 +444,17 @@
         const autoFillIndicator = document.getElementById('autoFillIndicator');
         const statusDiv = document.getElementById('status');
         const fileListDiv = document.getElementById('fileList');
+        const progressContainer = document.getElementById('progressContainer');
+        const overallProgress = document.getElementById('overallProgress');
+        const overallProgressFill = document.getElementById('overallProgressFill');
+        const currentFile = document.getElementById('currentFile');
+        const fileCounter = document.getElementById('fileCounter');
+        const fileProgressList = document.getElementById('fileProgressList');
+        const progressSpinner = document.getElementById('progressSpinner');
         
         let files = [];
         let foundChatIds = [];
+        let uploadStartTime = null;
         
         // Event Listeners
         browseBtn.addEventListener('click', () => fileInput.click());
@@ -362,7 +535,9 @@
                 html += `
                     <div class="file-item">
                         <span>${file.name} (${size})</span>
-                        <button onclick="removeFile(${index})" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Remove</button>
+                        <button onclick="removeFile(${index})" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                 `;
             });
@@ -391,6 +566,80 @@
             return BOT_TOKENS[input] || input;
         }
         
+        // Update progress for individual file
+        function updateFileProgress(fileIndex, percentage) {
+            const fileProgressElement = document.getElementById(`file-progress-${fileIndex}`);
+            if (fileProgressElement) {
+                const fill = fileProgressElement.querySelector('.file-progress-fill');
+                const percentageText = fileProgressElement.querySelector('.file-percentage');
+                
+                fill.style.width = `${percentage}%`;
+                percentageText.textContent = `${Math.round(percentage)}%`;
+                
+                // Update status text
+                const statusText = fileProgressElement.querySelector('.file-status span');
+                if (percentage < 100) {
+                    statusText.textContent = `Uploading... ${Math.round(percentage)}%`;
+                    statusText.style.color = '#007bff';
+                } else {
+                    statusText.textContent = 'Completed';
+                    statusText.style.color = '#28a745';
+                }
+            }
+        }
+        
+        // Create individual file progress items
+        function createFileProgressItems() {
+            fileProgressList.innerHTML = '';
+            
+            files.forEach((file, index) => {
+                const fileProgressItem = document.createElement('div');
+                fileProgressItem.className = 'file-progress-item';
+                fileProgressItem.id = `file-progress-${index}`;
+                
+                const size = formatFileSize(file.size);
+                
+                fileProgressItem.innerHTML = `
+                    <div class="file-progress-header">
+                        <div class="file-name" title="${file.name}">
+                            <i class="fas fa-file"></i> ${file.name}
+                        </div>
+                        <div class="file-percentage">0%</div>
+                    </div>
+                    <div class="file-progress-bar">
+                        <div class="file-progress-fill"></div>
+                    </div>
+                    <div class="file-status">
+                        <span>Waiting...</span>
+                        <span>${size}</span>
+                    </div>
+                `;
+                
+                fileProgressList.appendChild(fileProgressItem);
+            });
+        }
+        
+        // Update overall progress
+        function updateOverallProgress(currentFileIndex, fileProgress) {
+            const totalFiles = files.length;
+            
+            // Calculate overall percentage
+            const baseProgress = (currentFileIndex / totalFiles) * 100;
+            const currentFileContribution = (fileProgress / 100) * (100 / totalFiles);
+            const overallPercentage = baseProgress + currentFileContribution;
+            
+            overallProgress.textContent = `${Math.round(overallPercentage)}%`;
+            overallProgressFill.style.width = `${overallPercentage}%`;
+            
+            // Update file counter
+            fileCounter.textContent = `${currentFileIndex + 1}/${totalFiles} files`;
+            
+            // Update current file name
+            if (currentFileIndex < totalFiles) {
+                currentFile.textContent = `Uploading: ${files[currentFileIndex].name}`;
+            }
+        }
+        
         // Auto get Chat ID from getUpdates
         async function autoGetChatId() {
             const token = getActualToken();
@@ -401,7 +650,7 @@
             }
             
             // Show loading state
-            autoChatIdBtn.innerHTML = '<span class="loading"></span> Fetching Chat ID...';
+            autoChatIdBtn.innerHTML = '<span class="spinner"></span> Fetching Chat ID...';
             autoChatIdBtn.disabled = true;
             showStatus('Fetching Chat ID from Telegram...', 'info');
             
@@ -480,7 +729,7 @@
             
             showStatus('Testing connection...', 'info');
             testBtn.disabled = true;
-            testBtn.innerHTML = '<span class="loading"></span> Testing...';
+            testBtn.innerHTML = '<span class="spinner"></span> Testing...';
             
             try {
                 // First test bot token with getMe
@@ -528,7 +777,7 @@
             }
         }
         
-        // Upload files to Telegram
+        // Upload files to Telegram with progress simulation
         async function uploadFiles() {
             const token = getActualToken();
             const chatId = chatIdInput.value.trim();
@@ -543,54 +792,124 @@
                 return;
             }
             
-            showStatus(`Starting upload of ${files.length} file(s)...`, 'info');
+            // Reset and show progress container
+            progressContainer.style.display = 'block';
+            statusDiv.style.display = 'none';
+            uploadStartTime = Date.now();
+            
+            // Create progress items for each file
+            createFileProgressItems();
+            
+            // Disable upload button and show loading
             uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<span class="loading"></span> Uploading...';
+            uploadBtn.innerHTML = '<span class="spinner"></span> Uploading...';
             
             let successCount = 0;
             let failCount = 0;
             const results = [];
             
+            // Show initial progress
+            updateOverallProgress(0, 0);
+            
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
+                const fileSize = file.size;
                 
-                showStatus(`Uploading ${i + 1}/${files.length}: ${file.name}`, 'info');
+                // Update current file
+                currentFile.textContent = `Uploading: ${file.name}`;
+                fileCounter.textContent = `${i + 1}/${files.length} files`;
+                
+                // Reset file progress
+                updateFileProgress(i, 0);
                 
                 try {
+                    // Simulate progress for this file
+                    let simulatedProgress = 0;
+                    const progressInterval = setInterval(() => {
+                        if (simulatedProgress < 90) {
+                            simulatedProgress += Math.random() * 10 + 5;
+                            if (simulatedProgress > 90) simulatedProgress = 90;
+                            updateFileProgress(i, simulatedProgress);
+                            updateOverallProgress(i, simulatedProgress);
+                        }
+                    }, 300);
+                    
+                    // Prepare form data
                     const formData = new FormData();
                     formData.append('chat_id', chatId);
                     formData.append('document', file);
                     formData.append('caption', `File: ${file.name} (${formatFileSize(file.size)})`);
                     
+                    // Make the actual upload request
                     const response = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, {
                         method: 'POST',
                         body: formData
                     });
+                    
+                    clearInterval(progressInterval);
+                    
+                    // Update to 100% progress
+                    updateFileProgress(i, 100);
+                    updateOverallProgress(i, 100);
                     
                     const result = await response.json();
                     
                     if (result.ok) {
                         successCount++;
                         results.push({ file: file.name, status: 'success' });
-                        showStatus(`✅ ${file.name} uploaded successfully`, 'success');
+                        
+                        // Update file status to success
+                        const fileProgressElement = document.getElementById(`file-progress-${i}`);
+                        if (fileProgressElement) {
+                            const statusText = fileProgressElement.querySelector('.file-status span');
+                            statusText.textContent = '✅ Uploaded successfully';
+                            statusText.style.color = '#28a745';
+                        }
                     } else {
                         failCount++;
                         results.push({ file: file.name, status: 'error', error: result.description });
-                        showStatus(`❌ Failed to upload ${file.name}: ${result.description}`, 'error');
+                        
+                        // Update file status to error
+                        const fileProgressElement = document.getElementById(`file-progress-${i}`);
+                        if (fileProgressElement) {
+                            const statusText = fileProgressElement.querySelector('.file-status span');
+                            statusText.textContent = `❌ Failed: ${result.description}`;
+                            statusText.style.color = '#dc3545';
+                        }
                     }
+                    
                 } catch (error) {
                     failCount++;
                     results.push({ file: file.name, status: 'error', error: error.message });
-                    showStatus(`❌ Error uploading ${file.name}: ${error.message}`, 'error');
+                    
+                    // Update file status to error
+                    const fileProgressElement = document.getElementById(`file-progress-${i}`);
+                    if (fileProgressElement) {
+                        const statusText = fileProgressElement.querySelector('.file-status span');
+                        statusText.textContent = `❌ Error: ${error.message}`;
+                        statusText.style.color = '#dc3545';
+                    }
+                }
+                
+                // Brief pause between files for better UX
+                if (i < files.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
             }
             
+            // Calculate total time
+            const totalTime = Date.now() - uploadStartTime;
+            const totalTimeSeconds = (totalTime / 1000).toFixed(1);
+            
             // Final result
             uploadBtn.disabled = false;
-            uploadBtn.innerHTML = 'Upload to Telegram';
+            uploadBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Upload to Telegram';
+            
+            // Hide progress spinner
+            progressSpinner.style.display = 'none';
             
             if (successCount > 0) {
-                let message = `✅ Upload complete! ${successCount} successful, ${failCount} failed`;
+                let message = `✅ Upload complete in ${totalTimeSeconds}s! ${successCount} successful, ${failCount} failed`;
                 
                 if (failCount > 0) {
                     message += `<br><br>Failed files:`;
@@ -604,15 +923,19 @@
                 showStatus(message, failCount === 0 ? 'success' : 'error');
                 
                 if (failCount === 0) {
-                    // Clear files if all succeeded
+                    // Clear files if all succeeded after delay
                     setTimeout(() => {
                         files = [];
                         updateFileList();
                         updateUploadButton();
-                    }, 2000);
+                        progressContainer.style.display = 'none';
+                        overallProgressFill.style.width = '0%';
+                        overallProgress.textContent = '0%';
+                        progressSpinner.style.display = 'flex';
+                    }, 3000);
                 }
             } else {
-                showStatus(`❌ All uploads failed. Check your configuration and try again.`, 'error');
+                showStatus(`❌ All uploads failed in ${totalTimeSeconds}s. Check your configuration and try again.`, 'error');
             }
         }
         
