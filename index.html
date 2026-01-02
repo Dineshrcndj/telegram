@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram File Uploader - Working Solution</title>
+    <title>Telegram File Uploader - Auto Chat ID</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,43 +14,32 @@
         }
         
         body {
-            background-color: #f5f7fa;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #333;
             line-height: 1.6;
             padding: 20px;
             min-height: 100vh;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
         
         .container {
             max-width: 900px;
             margin: 0 auto;
             background-color: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
         
         header {
             background: linear-gradient(90deg, #0088cc, #34b7f1);
             color: white;
-            padding: 25px 30px;
+            padding: 30px;
             text-align: center;
         }
         
         h1 {
-            font-size: 28px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-        
-        .subtitle {
-            font-size: 16px;
-            opacity: 0.9;
-            font-weight: 300;
+            font-size: 32px;
+            margin-bottom: 10px;
         }
         
         .content {
@@ -58,289 +47,146 @@
         }
         
         .card {
-            background-color: #f8f9fa;
-            border-radius: 12px;
+            background: #f8f9fa;
+            border-radius: 15px;
             padding: 25px;
             margin-bottom: 25px;
-            border-left: 4px solid #34b7f1;
-        }
-        
-        .card h3 {
-            color: #0088cc;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            border: 2px solid #e9ecef;
         }
         
         .form-group {
             margin-bottom: 20px;
+            position: relative;
         }
         
         label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #444;
+            color: #495057;
         }
         
         input[type="text"] {
             width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e1e5eb;
-            border-radius: 10px;
+            padding: 14px;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
             font-size: 16px;
-            transition: border-color 0.3s;
         }
         
-        input[type="text"]:focus {
-            border-color: #34b7f1;
-            outline: none;
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+        }
+        
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .auto-fill-indicator {
+            position: absolute;
+            right: 10px;
+            top: 38px;
+            color: #28a745;
+            font-size: 14px;
+            display: none;
         }
         
         .file-upload-area {
-            border: 3px dashed #c3cfe2;
+            border: 3px dashed #adb5bd;
             border-radius: 12px;
             padding: 40px 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
             margin-bottom: 20px;
-        }
-        
-        .file-upload-area:hover, .file-upload-area.dragover {
-            border-color: #34b7f1;
-            background-color: rgba(52, 183, 241, 0.05);
-        }
-        
-        .file-upload-area i {
-            font-size: 48px;
-            color: #34b7f1;
-            margin-bottom: 15px;
-        }
-        
-        .file-upload-area h4 {
-            font-size: 20px;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .file-upload-area p {
-            color: #666;
-            margin-bottom: 15px;
-        }
-        
-        .btn {
-            display: inline-block;
-            background: linear-gradient(90deg, #0088cc, #34b7f1);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            font-size: 16px;
-            border-radius: 10px;
-            cursor: pointer;
             transition: all 0.3s;
-            font-weight: 600;
-            text-decoration: none;
         }
         
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 183, 241, 0.3);
-        }
-        
-        .btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .btn i {
-            margin-right: 8px;
+        .file-upload-area:hover {
+            border-color: #007bff;
+            background: #f8f9fa;
         }
         
         .file-list {
-            margin-top: 20px;
-            max-height: 200px;
-            overflow-y: auto;
+            margin: 20px 0;
         }
         
         .file-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 15px;
-            background-color: white;
+            background: white;
+            padding: 12px;
             border-radius: 8px;
             margin-bottom: 10px;
-            border: 1px solid #e1e5eb;
-        }
-        
-        .file-info {
+            border: 1px solid #dee2e6;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 12px;
-        }
-        
-        .file-icon {
-            color: #34b7f1;
-            font-size: 20px;
-        }
-        
-        .file-name {
-            font-weight: 500;
-            max-width: 300px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        .file-size {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .remove-file {
-            color: #ff6b6b;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-        }
-        
-        .progress-container {
-            margin-top: 25px;
-            display: none;
-        }
-        
-        .progress-bar {
-            height: 10px;
-            background-color: #e1e5eb;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #0088cc, #34b7f1);
-            width: 0%;
-            transition: width 0.3s;
-        }
-        
-        .progress-text {
-            text-align: center;
-            font-weight: 500;
-            color: #444;
         }
         
         .status {
             padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
             display: none;
-            text-align: center;
         }
         
-        .status.success {
-            background-color: #d4edda;
+        .success {
+            background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
         
-        .status.error {
-            background-color: #f8d7da;
+        .error {
+            background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
         
-        .instructions {
-            background-color: #fff9e6;
-            border-left: 4px solid #ffc107;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 30px;
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
         }
         
-        .instructions h4 {
-            color: #856404;
-            margin-bottom: 10px;
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
         }
         
-        .instructions ol {
-            padding-left: 20px;
-            margin-bottom: 10px;
-        }
-        
-        .instructions li {
-            margin-bottom: 8px;
-        }
-        
-        .instructions code {
-            background-color: #f1f1f1;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-        }
-        
-        .debug-info {
-            background-color: #e9ecef;
-            border-left: 4px solid #6c757d;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-        
-        .debug-info h5 {
-            color: #495057;
-            margin-bottom: 10px;
-        }
-        
-        .test-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .test-btn {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .test-btn:hover {
-            background: #5a6268;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         footer {
             text-align: center;
-            margin-top: 30px;
-            color: #666;
-            font-size: 14px;
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                border-radius: 10px;
-            }
-            
-            header, .content {
-                padding: 20px;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-            
-            .test-buttons {
-                flex-direction: column;
-            }
+            padding: 20px;
+            color: #6c757d;
+            border-top: 1px solid #e9ecef;
         }
     </style>
 </head>
@@ -348,637 +194,463 @@
     <div class="container">
         <header>
             <h1><i class="fab fa-telegram"></i> Telegram File Uploader</h1>
-            <p class="subtitle">Upload files and send them via Telegram Bot - Fixed Working Version</p>
+            <p>Auto Chat ID Detection - Works directly in browser</p>
         </header>
         
         <div class="content">
+            <!-- Configuration -->
             <div class="card">
-                <h3><i class="fas fa-key"></i> Telegram Bot Configuration</h3>
+                <h3>Configuration</h3>
+                
                 <div class="form-group">
-                    <label for="botToken">Bot Token</label>
-                    <input type="text" id="botToken" placeholder="Enter your Telegram Bot Token">
+                    <label>Bot Token</label>
+                    <input type="text" id="botToken" placeholder="Enter your bot token">
+                    <small style="color: #666;">enter your bot token</small>
                 </div>
+                
                 <div class="form-group">
-                    <label for="chatId">Chat ID</label>
-                    <input type="text" id="chatId" placeholder="Enter your Chat ID">
+                    <label>Chat ID</label>
+                    <input type="text" id="chatId" placeholder="Chat ID will auto-fill when detected">
+                    <span class="auto-fill-indicator" id="autoFillIndicator">
+                        <i class="fas fa-check-circle"></i> Auto-filled
+                    </span>
                 </div>
-                <div class="debug-info">
-                    <h5><i class="fas fa-bug"></i> Configuration Check</h5>
-                    <p>Bot Token starts with: <span id="token-preview">(not set)</span></p>
-                    <p>Chat ID: <span id="chatid-preview">(not set)</span></p>
-                    <div class="test-buttons">
-                        <button class="test-btn" id="testConnection">
-                            <i class="fas fa-wifi"></i> Test Connection
-                        </button>
-                        <button class="test-btn" id="getChatId">
-                            <i class="fas fa-id-card"></i> Get Chat ID Helper
-                        </button>
-                    </div>
+                
+                <div>
+                    <button class="btn" id="testBtn">Test Connection</button>
+                    <button class="btn btn-success" id="autoChatIdBtn">
+                        <i class="fas fa-bolt"></i> Auto Get Chat ID
+                    </button>
                 </div>
             </div>
             
+            <!-- File Upload -->
             <div class="card">
-                <h3><i class="fas fa-cloud-upload-alt"></i> File Upload</h3>
+                <h3>Upload Files (Max 50MB)</h3>
+                
                 <div class="file-upload-area" id="dropArea">
-                    <i class="fas fa-file-upload"></i>
-                    <h4>Drag & Drop Files Here</h4>
-                    <p>or click to browse files (Max 20 MB per file)</p>
-                    <button class="btn" id="browseBtn"><i class="fas fa-folder-open"></i> Browse Files</button>
+                    <p><i class="fas fa-cloud-upload-alt fa-3x"></i></p>
+                    <p>Drag & drop files here or click to browse</p>
                     <input type="file" id="fileInput" multiple style="display: none;">
+                    <button class="btn" id="browseBtn">Browse Files</button>
                 </div>
                 
-                <div class="file-list" id="fileList"></div>
+                <div id="fileList"></div>
                 
-                <div class="progress-container" id="progressContainer">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
-                    </div>
-                    <div class="progress-text" id="progressText">0% uploaded</div>
-                </div>
-                
-                <div class="test-buttons" style="justify-content: center; margin-top: 20px;">
-                    <button class="btn" id="sendBtn" disabled>
-                        <i class="fas fa-paper-plane"></i> Send to Telegram
-                    </button>
-                    <button class="btn" id="sendAlternativeBtn" style="background: #28a745;" disabled>
-                        <i class="fas fa-exchange-alt"></i> Alternative Method
-                    </button>
-                </div>
+                <button class="btn" id="uploadBtn" disabled>Upload to Telegram</button>
                 
                 <div class="status" id="status"></div>
             </div>
             
-            <div class="instructions">
-                <h4><i class="fas fa-info-circle"></i> How to use this tool - IMPORTANT</h4>
+            <!-- Instructions -->
+            <div class="card">
+                <h3>How to Use:</h3>
                 <ol>
-                    <li><strong>Create a bot</strong> via <a href="https://t.me/botfather" target="_blank">@BotFather</a> and get your bot token</li>
-                    <li><strong>Start your bot</strong> by sending "/start" message to it</li>
-                    <li><strong>Get your Chat ID</strong> by:
-                        <ul>
-                            <li>Visit: <code id="getUpdatesUrl">https://api.telegram.org/botYOUR_TOKEN/getUpdates</code></li>
-                            <li>OR click "Get Chat ID Helper" button above</li>
-                            <li>Look for "chat":{"id":123456789} in the response</li>
-                        </ul>
-                    </li>
-                    <li><strong>Test connection</strong> with the "Test Connection" button</li>
-                    <li><strong>Upload files</strong> - Use "Alternative Method" if regular method fails</li>
+                    <li><strong>Enter your bot token</strong></li>
+                    <li><strong>Click "Auto Get Chat ID"</strong> - This will automatically fetch and fill your Chat ID</li>
+                    <li><strong>Send a message to your bot</strong> first if no Chat ID is found</li>
+                    <li><strong>Test connection</strong> to verify everything works</li>
+                    <li><strong>Upload files</strong> (max 50MB each)</li>
                 </ol>
-                <p><strong>Note:</strong> Telegram limits: Max 50 MB per file. For frontend, recommended max is 20 MB.</p>
             </div>
         </div>
         
         <footer>
-            <p>Telegram File Uploader &copy; 2023 | Fixed working version</p>
+            <p>Auto Chat ID Detection - No manual copying needed</p>
         </footer>
     </div>
 
     <script>
+        // Configuration
+        const BOT_TOKENS = {
+            'dinesh': '8083496802:AAE3h44C7ydCWOjAQyE5kCD3wbBbymnugk8', // Replace with actual token
+            'demo': '1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgh'
+        };
+        
         // DOM Elements
         const botTokenInput = document.getElementById('botToken');
         const chatIdInput = document.getElementById('chatId');
-        const dropArea = document.getElementById('dropArea');
         const fileInput = document.getElementById('fileInput');
         const browseBtn = document.getElementById('browseBtn');
-        const fileList = document.getElementById('fileList');
-        const sendBtn = document.getElementById('sendBtn');
-        const sendAlternativeBtn = document.getElementById('sendAlternativeBtn');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-        const status = document.getElementById('status');
-        const testConnectionBtn = document.getElementById('testConnection');
-        const getChatIdBtn = document.getElementById('getChatId');
-        const tokenPreview = document.getElementById('token-preview');
-        const chatidPreview = document.getElementById('chatid-preview');
-        const getUpdatesUrl = document.getElementById('getUpdatesUrl');
+        const dropArea = document.getElementById('dropArea');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const testBtn = document.getElementById('testBtn');
+        const autoChatIdBtn = document.getElementById('autoChatIdBtn');
+        const autoFillIndicator = document.getElementById('autoFillIndicator');
+        const statusDiv = document.getElementById('status');
+        const fileListDiv = document.getElementById('fileList');
         
-        // File storage
         let files = [];
+        let foundChatIds = [];
         
         // Event Listeners
         browseBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFiles);
+        uploadBtn.addEventListener('click', uploadFiles);
+        testBtn.addEventListener('click', testConnection);
+        autoChatIdBtn.addEventListener('click', autoGetChatId);
         
-        fileInput.addEventListener('change', (e) => {
-            handleFiles(e.target.files);
+        // When bot token changes, enable auto Chat ID button
+        botTokenInput.addEventListener('input', function() {
+            const token = this.value.trim();
+            autoChatIdBtn.disabled = !token;
+            updateUploadButton();
+            
+            // Save to localStorage
+            if (token) {
+                localStorage.setItem('bot_token', token);
+            }
         });
         
-        // Drag and drop events
+        chatIdInput.addEventListener('input', function() {
+            updateUploadButton();
+            if (this.value.trim()) {
+                localStorage.setItem('chat_id', this.value.trim());
+            }
+        });
+        
+        // Drag & Drop
         dropArea.addEventListener('dragover', (e) => {
             e.preventDefault();
-            dropArea.classList.add('dragover');
+            dropArea.style.borderColor = '#007bff';
+            dropArea.style.background = '#e9ecef';
         });
         
         dropArea.addEventListener('dragleave', () => {
-            dropArea.classList.remove('dragover');
+            dropArea.style.borderColor = '#adb5bd';
+            dropArea.style.background = 'transparent';
         });
         
         dropArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropArea.classList.remove('dragover');
-            handleFiles(e.dataTransfer.files);
+            dropArea.style.borderColor = '#adb5bd';
+            dropArea.style.background = 'transparent';
+            handleFiles({ target: { files: e.dataTransfer.files } });
         });
         
-        sendBtn.addEventListener('click', sendToTelegram);
-        sendAlternativeBtn.addEventListener('click', sendToTelegramAlternative);
-        testConnectionBtn.addEventListener('click', testTelegramConnection);
-        getChatIdBtn.addEventListener('click', getChatIdHelper);
-        
-        // Update preview when token changes
-        botTokenInput.addEventListener('input', () => {
-            const token = botTokenInput.value.trim();
-            if (token) {
-                tokenPreview.textContent = token.substring(0, 15) + '...';
-                // Update the URL in instructions
-                getUpdatesUrl.textContent = `https://api.telegram.org/bot${token}/getUpdates`;
-            } else {
-                tokenPreview.textContent = '(not set)';
-            }
-            updateSendButton();
-        });
-        
-        chatIdInput.addEventListener('input', () => {
-            const chatId = chatIdInput.value.trim();
-            chatidPreview.textContent = chatId || '(not set)';
-            updateSendButton();
-        });
-        
-        // Handle selected files
-        function handleFiles(selectedFiles) {
-            for (let i = 0; i < selectedFiles.length; i++) {
-                const file = selectedFiles[i];
-                
-                // Check file size (max 50 MB for Telegram, but safer at 20 MB for frontend)
-                if (file.size > 20 * 1024 * 1024) {
-                    showStatus(`File "${file.name}" is too large (${formatFileSize(file.size)}). Max recommended size is 20 MB.`, 'error');
-                    continue;
+        // Handle file selection
+        function handleFiles(e) {
+            const newFiles = Array.from(e.target.files);
+            
+            newFiles.forEach(file => {
+                // Check file size (50MB max)
+                if (file.size > 50 * 1024 * 1024) {
+                    showStatus(`File "${file.name}" is too large (max 50MB)`, 'error');
+                    return;
                 }
                 
-                // Check if file already exists
-                if (!files.some(f => f.name === file.name && f.size === file.size)) {
+                // Add to list if not duplicate
+                if (!files.find(f => f.name === file.name && f.size === file.size)) {
                     files.push(file);
                 }
-            }
+            });
             
             updateFileList();
-            updateSendButton();
+            updateUploadButton();
         }
         
-        // Update the file list UI
+        // Update file list display
         function updateFileList() {
-            fileList.innerHTML = '';
-            
             if (files.length === 0) {
-                fileList.innerHTML = '<p style="text-align: center; color: #666;">No files selected</p>';
+                fileListDiv.innerHTML = '<p>No files selected</p>';
                 return;
             }
             
+            let html = '<h4>Selected Files:</h4>';
             files.forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                
-                const fileSize = formatFileSize(file.size);
-                const fileType = file.type || 'Unknown type';
-                
-                fileItem.innerHTML = `
-                    <div class="file-info">
-                        <i class="fas ${getFileIcon(file.type)} file-icon"></i>
-                        <div>
-                            <div class="file-name" title="${file.name}">${file.name}</div>
-                            <div class="file-size">${fileSize} • ${fileType}</div>
-                        </div>
+                const size = formatFileSize(file.size);
+                html += `
+                    <div class="file-item">
+                        <span>${file.name} (${size})</span>
+                        <button onclick="removeFile(${index})" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Remove</button>
                     </div>
-                    <button class="remove-file" data-index="${index}">
-                        <i class="fas fa-times"></i>
-                    </button>
                 `;
-                
-                fileList.appendChild(fileItem);
             });
             
-            // Add event listeners to remove buttons
-            document.querySelectorAll('.remove-file').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
-                    files.splice(index, 1);
-                    updateFileList();
-                    updateSendButton();
-                });
-            });
+            fileListDiv.innerHTML = html;
         }
         
-        // Get appropriate icon for file type
-        function getFileIcon(fileType) {
-            if (!fileType) return 'fa-file';
-            
-            if (fileType.startsWith('image/')) return 'fa-file-image';
-            if (fileType.startsWith('video/')) return 'fa-file-video';
-            if (fileType.startsWith('audio/')) return 'fa-file-audio';
-            if (fileType.includes('pdf')) return 'fa-file-pdf';
-            if (fileType.includes('word') || fileType.includes('document')) return 'fa-file-word';
-            if (fileType.includes('excel') || fileType.includes('spreadsheet')) return 'fa-file-excel';
-            if (fileType.includes('zip') || fileType.includes('compressed')) return 'fa-file-archive';
-            if (fileType.includes('text')) return 'fa-file-alt';
-            
-            return 'fa-file';
-        }
+        // Remove file from list
+        window.removeFile = function(index) {
+            files.splice(index, 1);
+            updateFileList();
+            updateUploadButton();
+        };
         
-        // Update send button state
-        function updateSendButton() {
-            const botToken = botTokenInput.value.trim();
+        // Update upload button state
+        function updateUploadButton() {
+            const token = getActualToken();
             const chatId = chatIdInput.value.trim();
             
-            if (files.length > 0 && botToken && chatId) {
-                sendBtn.disabled = false;
-                sendAlternativeBtn.disabled = false;
-            } else {
-                sendBtn.disabled = true;
-                sendAlternativeBtn.disabled = true;
-            }
+            uploadBtn.disabled = !(token && chatId && files.length > 0);
         }
         
-        // Format file size
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
+        // Get actual bot token (handles auto-token)
+        function getActualToken() {
+            const input = botTokenInput.value.toLowerCase().trim();
+            return BOT_TOKENS[input] || input;
+        }
+        
+        // Auto get Chat ID from getUpdates
+        async function autoGetChatId() {
+            const token = getActualToken();
             
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            if (!token) {
+                showStatus('Please enter bot token first', 'error');
+                return;
+            }
             
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            // Show loading state
+            autoChatIdBtn.innerHTML = '<span class="loading"></span> Fetching Chat ID...';
+            autoChatIdBtn.disabled = true;
+            showStatus('Fetching Chat ID from Telegram...', 'info');
+            
+            try {
+                // Call getUpdates endpoint
+                const response = await fetch(`https://api.telegram.org/bot${token}/getUpdates`);
+                const result = await response.json();
+                
+                if (result.ok && result.result && result.result.length > 0) {
+                    // Extract all unique chat IDs
+                    foundChatIds = [];
+                    result.result.forEach(update => {
+                        if (update.message && update.message.chat && update.message.chat.id) {
+                            const chatId = update.message.chat.id.toString();
+                            if (!foundChatIds.includes(chatId)) {
+                                foundChatIds.push(chatId);
+                            }
+                        }
+                    });
+                    
+                    if (foundChatIds.length > 0) {
+                        // Auto-fill the first Chat ID
+                        chatIdInput.value = foundChatIds[0];
+                        localStorage.setItem('chat_id', foundChatIds[0]);
+                        
+                        // Show auto-fill indicator
+                        autoFillIndicator.style.display = 'inline-block';
+                        setTimeout(() => {
+                            autoFillIndicator.style.display = 'none';
+                        }, 3000);
+                        
+                        // Show success message
+                        if (foundChatIds.length === 1) {
+                            showStatus(`✅ Auto-detected Chat ID: ${foundChatIds[0]}`, 'success');
+                        } else {
+                            showStatus(`✅ Auto-filled Chat ID: ${foundChatIds[0]} (Found ${foundChatIds.length} total)`, 'success');
+                        }
+                        
+                    } else {
+                        showStatus('No Chat ID found. Please send a message to your bot first, then try again.', 'error');
+                    }
+                } else {
+                    showStatus('No messages found. Please send a message to your bot first, then click "Auto Get Chat ID" again.', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error fetching Chat ID:', error);
+                showStatus(`Error fetching Chat ID: ${error.message}`, 'error');
+                
+                // Fallback: Show manual instructions
+                const url = `https://api.telegram.org/bot${token}/getUpdates`;
+                showStatus(`
+                    <strong>Manual Method:</strong><br><br>
+                    1. Visit: <a href="${url}" target="_blank">${url}</a><br>
+                    2. Send "/start" to your bot first<br>
+                    3. Look for <code>"chat":{"id":123456789}</code><br>
+                    4. Copy the number and paste above
+                `, 'info');
+            } finally {
+                // Reset button state
+                autoChatIdBtn.innerHTML = '<i class="fas fa-bolt"></i> Auto Get Chat ID';
+                autoChatIdBtn.disabled = false;
+                updateUploadButton();
+            }
         }
         
         // Test Telegram connection
-        async function testTelegramConnection() {
-            const botToken = botTokenInput.value.trim();
+        async function testConnection() {
+            const token = getActualToken();
             const chatId = chatIdInput.value.trim();
             
-            if (!botToken) {
-                showStatus('Please enter your Bot Token first', 'error');
+            if (!token) {
+                showStatus('Please enter bot token first', 'error');
                 return;
             }
             
-            showStatus('Testing connection to Telegram...', 'error');
-            sendBtn.disabled = true;
-            sendAlternativeBtn.disabled = true;
+            showStatus('Testing connection...', 'info');
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<span class="loading"></span> Testing...';
             
             try {
-                // Test 1: Check if bot token is valid
-                const response = await fetch(`https://api.telegram.org/bot${botToken}/getMe`);
+                // First test bot token with getMe
+                const response = await fetch(`https://api.telegram.org/bot${token}/getMe`);
                 const result = await response.json();
                 
                 if (result.ok) {
-                    showStatus(`✅ Bot connection successful! Bot name: ${result.result.username}`, 'success');
+                    let message = `✅ Bot is valid! Username: @${result.result.username}`;
                     
-                    // Test 2: Check if we can send messages (if chat ID is provided)
+                    // If chat ID is provided, test sending a message
                     if (chatId) {
-                        setTimeout(async () => {
-                            try {
-                                const msgResponse = await sendTextMessage("Connection test message from web uploader");
-                                if (msgResponse.ok) {
-                                    showStatus(`✅ Connection test complete! Bot "${result.result.username}" can send messages to chat ${chatId}`, 'success');
-                                } else {
-                                    showStatus(`⚠️ Bot is valid but cannot send to chat ${chatId}. Error: ${msgResponse.description}`, 'error');
-                                }
-                            } catch (error) {
-                                showStatus(`⚠️ Bot is valid but message test failed. Check your chat ID.`, 'error');
+                        try {
+                            const formData = new FormData();
+                            formData.append('chat_id', chatId);
+                            formData.append('text', '✅ Connection test successful from Telegram File Uploader!');
+                            
+                            const sendResponse = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                                method: 'POST',
+                                body: formData
+                            });
+                            
+                            const sendResult = await sendResponse.json();
+                            if (sendResult.ok) {
+                                message += `<br>✅ Can send messages to Chat ID: ${chatId}`;
+                            } else {
+                                message += `<br>⚠️ Bot valid but cannot send to Chat ID ${chatId}: ${sendResult.description}`;
                             }
-                            sendBtn.disabled = false;
-                            sendAlternativeBtn.disabled = false;
-                            updateSendButton();
-                        }, 1000);
+                        } catch (sendError) {
+                            message += `<br>⚠️ Message test failed: ${sendError.message}`;
+                        }
                     } else {
-                        showStatus(`✅ Bot connection successful! Bot name: ${result.result.username}. Now enter your Chat ID.`, 'success');
-                        sendBtn.disabled = false;
-                        sendAlternativeBtn.disabled = false;
-                        updateSendButton();
+                        message += `<br>⚠️ No Chat ID configured. Click "Auto Get Chat ID" to detect it.`;
                     }
+                    
+                    showStatus(message, 'success');
                 } else {
-                    showStatus(`❌ Invalid bot token. Error: ${result.description}`, 'error');
-                    sendBtn.disabled = false;
-                    sendAlternativeBtn.disabled = false;
-                    updateSendButton();
+                    showStatus(`❌ Invalid bot token: ${result.description || 'Unknown error'}`, 'error');
                 }
+                
             } catch (error) {
-                showStatus(`❌ Connection failed. Check your internet or bot token. Error: ${error.message}`, 'error');
-                sendBtn.disabled = false;
-                sendAlternativeBtn.disabled = false;
-                updateSendButton();
+                showStatus(`❌ Connection error: ${error.message}`, 'error');
+            } finally {
+                testBtn.disabled = false;
+                testBtn.innerHTML = 'Test Connection';
             }
         }
         
-        // Send text message (for testing)
-        async function sendTextMessage(text) {
-            const botToken = botTokenInput.value.trim();
+        // Upload files to Telegram
+        async function uploadFiles() {
+            const token = getActualToken();
             const chatId = chatIdInput.value.trim();
             
-            const formData = new FormData();
-            formData.append('chat_id', chatId);
-            formData.append('text', text);
-            
-            const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                body: formData
-            });
-            
-            return await response.json();
-        }
-        
-        // Get Chat ID helper
-        function getChatIdHelper() {
-            const botToken = botTokenInput.value.trim();
-            
-            if (!botToken) {
-                showStatus('Please enter your Bot Token first', 'error');
-                return;
-            }
-            
-            const url = `https://api.telegram.org/bot${botToken}/getUpdates`;
-            
-            // Show instructions
-            showStatus(`1. Visit this URL: ${url}<br>2. Look for "chat":{"id":YOUR_CHAT_ID}<br>3. Send a message to your bot first if no results`, 'error');
-            
-            // Try to fetch and parse automatically
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.ok && data.result.length > 0) {
-                        const chatId = data.result[0].message.chat.id;
-                        chatIdInput.value = chatId;
-                        chatidPreview.textContent = chatId;
-                        showStatus(`✅ Found Chat ID: ${chatId}. Auto-filled!`, 'success');
-                        updateSendButton();
-                    } else {
-                        showStatus(`No messages found. Please send a message to your bot first, then try again.`, 'error');
-                    }
-                })
-                .catch(error => {
-                    showStatus(`Could not fetch updates. Please visit the URL manually.`, 'error');
-                });
-        }
-        
-        // Send files to Telegram - METHOD 1 (Direct API)
-        async function sendToTelegram() {
-            const botToken = botTokenInput.value.trim();
-            const chatId = chatIdInput.value.trim();
-            
-            if (!botToken || !chatId) {
-                showStatus('Please enter both Bot Token and Chat ID', 'error');
+            if (!token || !chatId) {
+                showStatus('Please configure bot token and chat ID', 'error');
                 return;
             }
             
             if (files.length === 0) {
-                showStatus('Please select at least one file', 'error');
+                showStatus('Please select files to upload', 'error');
                 return;
             }
             
-            // Disable send button and show progress
-            sendBtn.disabled = true;
-            sendAlternativeBtn.disabled = true;
-            progressContainer.style.display = 'block';
-            status.style.display = 'none';
+            showStatus(`Starting upload of ${files.length} file(s)...`, 'info');
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<span class="loading"></span> Uploading...';
             
-            let successful = 0;
-            let failed = 0;
-            let errorDetails = [];
+            let successCount = 0;
+            let failCount = 0;
+            const results = [];
             
-            // Send files one by one
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 
-                // Update progress
-                const progressPercent = Math.round(((i) / files.length) * 100);
-                progressFill.style.width = `${progressPercent}%`;
-                progressText.textContent = `Uploading ${i + 1} of ${files.length}: ${file.name}`;
+                showStatus(`Uploading ${i + 1}/${files.length}: ${file.name}`, 'info');
                 
                 try {
-                    console.log(`Uploading file ${i+1}: ${file.name}, size: ${formatFileSize(file.size)}`);
-                    
-                    // Create FormData
                     const formData = new FormData();
                     formData.append('chat_id', chatId);
                     formData.append('document', file);
-                    formData.append('caption', `Uploaded via web: ${file.name}`);
+                    formData.append('caption', `File: ${file.name} (${formatFileSize(file.size)})`);
                     
-                    // Using Telegram Bot API to send document
-                    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendDocument`, {
+                    const response = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, {
                         method: 'POST',
                         body: formData
                     });
                     
                     const result = await response.json();
-                    console.log('Telegram API response:', result);
                     
                     if (result.ok) {
-                        successful++;
+                        successCount++;
+                        results.push({ file: file.name, status: 'success' });
+                        showStatus(`✅ ${file.name} uploaded successfully`, 'success');
                     } else {
-                        console.error('Telegram API error:', result);
-                        failed++;
-                        errorDetails.push(`${file.name}: ${result.description || 'Unknown error'}`);
+                        failCount++;
+                        results.push({ file: file.name, status: 'error', error: result.description });
+                        showStatus(`❌ Failed to upload ${file.name}: ${result.description}`, 'error');
                     }
                 } catch (error) {
-                    console.error('Upload error:', error);
-                    failed++;
-                    errorDetails.push(`${file.name}: ${error.message}`);
+                    failCount++;
+                    results.push({ file: file.name, status: 'error', error: error.message });
+                    showStatus(`❌ Error uploading ${file.name}: ${error.message}`, 'error');
                 }
             }
             
-            // Update progress to 100%
-            progressFill.style.width = '100%';
-            progressText.textContent = 'Upload complete!';
+            // Final result
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = 'Upload to Telegram';
             
-            // Show status message
-            if (failed === 0 && successful > 0) {
-                showStatus(`✅ Successfully sent ${successful} file(s) to Telegram!`, 'success');
-                // Reset after 3 seconds
-                setTimeout(() => {
-                    files = [];
-                    updateFileList();
-                    updateSendButton();
-                    progressContainer.style.display = 'none';
-                    progressFill.style.width = '0%';
-                }, 3000);
-            } else if (successful === 0) {
-                let errorMsg = `❌ Failed to send ${failed} file(s). `;
-                if (errorDetails.length > 0) {
-                    errorMsg += `Errors: ${errorDetails.join('; ')}. `;
-                }
-                errorMsg += 'Try the Alternative Method or check file size (max 20 MB).';
-                showStatus(errorMsg, 'error');
-                sendBtn.disabled = false;
-                sendAlternativeBtn.disabled = false;
-                updateSendButton();
-            } else {
-                showStatus(`⚠️ Sent ${successful} file(s) successfully, ${failed} file(s) failed. Errors: ${errorDetails.join('; ')}`, 'error');
-                sendBtn.disabled = false;
-                sendAlternativeBtn.disabled = false;
-                updateSendButton();
-            }
-        }
-        
-        // Send files to Telegram - METHOD 2 (Alternative - uses JSON instead of FormData)
-        async function sendToTelegramAlternative() {
-            const botToken = botTokenInput.value.trim();
-            const chatId = chatIdInput.value.trim();
-            
-            if (!botToken || !chatId) {
-                showStatus('Please enter both Bot Token and Chat ID', 'error');
-                return;
-            }
-            
-            if (files.length === 0) {
-                showStatus('Please select at least one file', 'error');
-                return;
-            }
-            
-            // Disable send button and show progress
-            sendBtn.disabled = true;
-            sendAlternativeBtn.disabled = true;
-            progressContainer.style.display = 'block';
-            status.style.display = 'none';
-            
-            let successful = 0;
-            let failed = 0;
-            let errorDetails = [];
-            
-            // Send files one by one
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
+            if (successCount > 0) {
+                let message = `✅ Upload complete! ${successCount} successful, ${failCount} failed`;
                 
-                // Update progress
-                const progressPercent = Math.round(((i) / files.length) * 100);
-                progressFill.style.width = `${progressPercent}%`;
-                progressText.textContent = `Uploading ${i + 1} of ${files.length}: ${file.name} (Alternative Method)`;
-                
-                try {
-                    console.log(`Uploading file ${i+1} with alternative method: ${file.name}`);
-                    
-                    // Convert file to base64 for alternative method
-                    const base64File = await fileToBase64(file);
-                    
-                    // Send as base64 (Telegram supports sending documents as base64)
-                    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendDocument`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            chat_id: chatId,
-                            document: base64File,
-                            caption: `Uploaded via web: ${file.name}`
-                        })
-                    });
-                    
-                    const result = await response.json();
-                    console.log('Telegram API response (alternative):', result);
-                    
-                    if (result.ok) {
-                        successful++;
-                    } else {
-                        console.error('Telegram API error (alternative):', result);
-                        failed++;
-                        errorDetails.push(`${file.name}: ${result.description || 'Unknown error'}`);
-                        
-                        // Fallback: Try to send as text if file is small and text-based
-                        if (file.size < 10000 && (file.type.includes('text') || file.name.endsWith('.txt'))) {
-                            try {
-                                const text = await file.text();
-                                const msgResult = await sendTextMessage(`File: ${file.name}\nContent:\n${text.substring(0, 3000)}`);
-                                if (msgResult.ok) {
-                                    successful++;
-                                    failed--;
-                                }
-                            } catch (e) {
-                                // Ignore fallback error
-                            }
+                if (failCount > 0) {
+                    message += `<br><br>Failed files:`;
+                    results.forEach(r => {
+                        if (r.status === 'error') {
+                            message += `<br>❌ ${r.file}: ${r.error}`;
                         }
-                    }
-                } catch (error) {
-                    console.error('Upload error (alternative):', error);
-                    failed++;
-                    errorDetails.push(`${file.name}: ${error.message}`);
+                    });
                 }
-            }
-            
-            // Update progress to 100%
-            progressFill.style.width = '100%';
-            progressText.textContent = 'Upload complete!';
-            
-            // Show status message
-            if (failed === 0 && successful > 0) {
-                showStatus(`✅ Successfully sent ${successful} file(s) to Telegram using Alternative Method!`, 'success');
-                // Reset after 3 seconds
-                setTimeout(() => {
-                    files = [];
-                    updateFileList();
-                    updateSendButton();
-                    progressContainer.style.display = 'none';
-                    progressFill.style.width = '0%';
-                }, 3000);
-            } else if (successful === 0) {
-                showStatus(`❌ Alternative method also failed for all ${failed} file(s). Try smaller files (< 5 MB) or check console for errors.`, 'error');
-                sendBtn.disabled = false;
-                sendAlternativeBtn.disabled = false;
-                updateSendButton();
+                
+                showStatus(message, failCount === 0 ? 'success' : 'error');
+                
+                if (failCount === 0) {
+                    // Clear files if all succeeded
+                    setTimeout(() => {
+                        files = [];
+                        updateFileList();
+                        updateUploadButton();
+                    }, 2000);
+                }
             } else {
-                showStatus(`⚠️ Alternative method: Sent ${successful} file(s) successfully, ${failed} file(s) failed.`, 'error');
-                sendBtn.disabled = false;
-                sendAlternativeBtn.disabled = false;
-                updateSendButton();
+                showStatus(`❌ All uploads failed. Check your configuration and try again.`, 'error');
             }
-        }
-        
-        // Convert file to base64
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                    // Remove data URL prefix (e.g., "data:image/png;base64,")
-                    const base64 = reader.result.split(',')[1];
-                    resolve(base64);
-                };
-                reader.onerror = error => reject(error);
-            });
         }
         
         // Show status message
         function showStatus(message, type) {
-            status.innerHTML = message;
-            status.className = `status ${type}`;
-            status.style.display = 'block';
-            
-            // Scroll to status
-            status.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            statusDiv.innerHTML = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            statusDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
         
-        // Initialize
-        updateFileList();
-        updateSendButton();
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
         
-        // Load saved credentials if available
-        window.addEventListener('load', () => {
-            const savedToken = localStorage.getItem('telegram_bot_token') || '';
-            const savedChatId = localStorage.getItem('telegram_chat_id') || '';
+        // Load saved data
+        function loadSavedData() {
+            const savedToken = localStorage.getItem('bot_token') || '';
+            const savedChatId = localStorage.getItem('chat_id') || '';
             
             if (savedToken) {
                 botTokenInput.value = savedToken;
-                botTokenInput.dispatchEvent(new Event('input'));
+                autoChatIdBtn.disabled = false;
             }
-            
             if (savedChatId) {
                 chatIdInput.value = savedChatId;
-                chatIdInput.dispatchEvent(new Event('input'));
             }
             
-            // Save credentials when changed
-            botTokenInput.addEventListener('change', () => {
-                localStorage.setItem('telegram_bot_token', botTokenInput.value);
-            });
-            
-            chatIdInput.addEventListener('change', () => {
-                localStorage.setItem('telegram_chat_id', chatIdInput.value);
-            });
-        });
+            updateUploadButton();
+        }
+        
+        // Initialize
+        loadSavedData();
+        updateUploadButton();
+        showStatus('Enter your bot token and click "Auto Get Chat ID" to start', 'info');
     </script>
 </body>
 </html>
